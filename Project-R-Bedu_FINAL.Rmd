@@ -363,7 +363,7 @@ print(mc)
 
 ```{r}
 
-#MATRIZ DE CONFUSIÓN DECISION TREE
+#MATRIZ DE CONFUSIÓN REGRESIÓN LOGÍSTICA
 
 #verdaderos <- datos_prueba$smoking  
 #predicciones <- predicciones_clase
