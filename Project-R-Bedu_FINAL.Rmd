@@ -36,6 +36,16 @@ View(dataset)
 ```
 
 ```{r}
+
+#DANIEL - Investigar las variables y términos médicos / Decidir argumentar si es bueno eliminar o no los outliers.
+
+
+```
+
+
+
+
+```{r}
 #EXPLORACIÓN DE LA ESTRUCTURA DEL DATASET
 str(dataset)
 
@@ -216,8 +226,28 @@ par(mfrow=c(1, 1))
 boxplot(dataset_filtrado, col = "lightblue", border = "black")
 par(cex.axis=0.8) 
 par(las=2)
+```
+
+
+```{r}
+#ESTADÍSTICAS POR COLUMNA DATOS FILTRADOS
+
+estadisticos_filtrado <- sapply(dataset_filtrado, function(col) {
+  c(
+    Promedio = mean(col),
+    Mediana = median(col),
+    Min = min(col),
+    Max = max(col),
+    Varianza = var(col),
+    Desviacion_Estándar = sd(col)
+  )
+})
+
+print(estadisticos_filtrado)
 
 ```
+
+
 ```{r}
 #DATOS FILTRADOS
 
@@ -279,10 +309,27 @@ dim(datos_prueba)
 ```{r}
 sum(is.na(datos_entrenamiento))
 sum(is.na(datos_prueba))
+```
+
+
+```{r}
+#BALANCEO DE DATOS DE ENTRENAMIENTO
+
+
+
+
+
+
+
+
+
 
 ```
 
+
+
 ```{r}
+
 #MODELO DE MACHINE DECISION TREE
 
 modelo_arbol <- rpart(smoking ~ ., data = datos_entrenamiento, method = "class")
