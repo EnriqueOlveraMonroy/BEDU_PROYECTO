@@ -55,7 +55,7 @@ print(nombres_columnas)
 ```{r}
 #ELIMINAR COLUMNA ID (VARIABLE CATEGÓRICA)
 
-dataset <- subset(dataset, select = -id)
+dataset <- subset(dataset, select = -c(id,  X, X.1))
 
 
 ```
