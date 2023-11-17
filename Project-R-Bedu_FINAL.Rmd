@@ -7,10 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# AAAAAA
-# BBBBBB
-# WWWWWWWWWWWW
-# CCCCCC
 
 #install.packages("AER")
 ```
@@ -35,7 +31,6 @@ library(rpart)
 
 ```{r}
 #CARGA DE DATOS
-setwd("C:/Users/enrik/OneDrive - UNIR/MOVIMIENTO LATERAL DE CARRERA/BECA BEDU 2023/PROTOTYPE DAY")
 dataset <- read.csv("Smokers.csv")
 View(dataset)
 ```
