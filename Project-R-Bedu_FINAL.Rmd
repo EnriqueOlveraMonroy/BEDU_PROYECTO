@@ -39,6 +39,109 @@ View(dataset)
 
 #DANIEL - Investigar las variables y términos médicos / Decidir argumentar si es bueno eliminar o no los outliers.
 
+#CONCLUSIÓN:
+# Sí hay que eliminar los outlayers de algunos valores, no tanto porque los valores no sean posibles, ya que algunos s epueden disparar con en condiciones especiales, pero en algunos hay inclongruencias, como en valores ALT y GTP. O errores de medición como en el caso de LDL. 
+
+# Eyesight (Visión) - Izquierda y Derecha:
+# 
+#   Descripción: Mide la agudeza visual en el ojo izquierdo y derecho.
+#   Valores normales: 20/20 se considera visión normal. (del 0 al 2 en el dataframe, no hay info al respecto en los metadatos pero parecen 3 categorías)
+#   Relación con el tabaco: Fumar puede aumentar el riesgo de enfermedades oculares como la degeneración macular y cataratas.
+#
+# Hearing (Audición) - Izquierda y Derecha:
+# Descripción: Evalúa la capacidad auditiva en el oído izquierdo y derecho.
+#   Valores normales: 1 es sí escucha, 2 es sordo.
+#   Relación con el tabaco: Fumar puede aumentar el riesgo de pérdida de audición relacionada con la edad.
+#   
+# Systolic Blood Pressure (Presión Arterial Sistólica):
+# Descripción: La presión arterial durante la fase de contracción del corazón.
+#   Valores normales: Menos de 120 mm Hg.
+#   Valores de riesgo: 120-139 mm Hg se considera prehipertensión.Más ya es hipertensión
+#   Relación con el tabaco: Fumar puede aumentar temporalmente la presión arterial.
+#   
+# Relaxation Blood Pressure (Presión Arterial Diastólica):
+# Descripción: La presión arterial durante la fase de relajación del corazón.
+#   Valores normales: Menos de 80 mm Hg.
+#   Valores de riesgo: 80-89 mm Hg se considera prehipertensión. más ya es hipertensión.
+#   Relación con el tabaco: Fumar puede aumentar temporalmente la presión arterial.
+#   
+# Fasting Blood Sugar (Glucosa en Ayunas):
+# Descripción: Nivel de glucosa en sangre después de un ayuno nocturno.
+#   Valores normales: Menos de 100 mg/dL.
+#   Valores de riesgo: 100-125 mg/dL se considera prediabetes.
+#   Relación con el tabaco: Fumar puede aumentar el riesgo de resistencia a la insulina y diabetes tipo 2.
+#   
+# Cholesterol Total:
+# Descripción: Cantidad total de colesterol en la sangre.
+#   Valores normales: Menos de 200 mg/dL.
+#   Valores de riesgo: 200-239 mg/dL se considera límite alto.
+#   Relación con el tabaco: Fumar puede reducir los niveles de lipoproteínas de alta densidad (HDL) y aumentar el riesgo de enfermedad cardiovascular.
+# 
+# Triglyceride (Triglicéridos):
+# Descripción: Tipo de grasa en la sangre.
+#   Valores normales: Menos de 150 mg/dL.
+#   Valores de riesgo: 150-199 mg/dL se considera límite alto.
+#   Relación con el tabaco: Fumar puede aumentar los niveles de triglicéridos.
+#   
+# HDL Cholesterol (Colesterol HDL):
+# Descripción: Conocido como "colesterol bueno", transporta el colesterol lejos de las células y los órganos.
+#   Valores normales: Más de 60 mg/dL.
+#   Valores de riesgo: Menos de 40 mg/dL se considera bajo.
+#   Relación con el tabaco: Fumar puede reducir los niveles de HDL.
+#   
+# LDL Cholesterol (Colesterol LDL):
+# Descripción: Conocido como "colesterol malo", se acumula en las paredes de los vasos sanguíneos.
+#   Valores normales: Menos de 100 mg/dL.
+#   Valores de riesgo: 100-129 mg/dL se considera cerca del límite alto.
+#   Relación con el tabaco: Fumar puede aumentar los niveles de LDL.
+#   
+# Hemoglobin (Hemoglobina):
+# Descripción: Proteína en los glóbulos rojos que transporta oxígeno.
+#   Valores normales: Varían según la edad y el género.
+    # Hombres adultos: 13.8 a 17.2 gramos por decilitro (g/dL).
+    # Mujeres adultas: 12.1 a 15.1 g/dL.
+#   Relación con el tabaco: Fumar puede afectar la capacidad de la sangre para transportar oxígeno.
+# 
+# Urine Protein (Proteína en la Orina):
+# Descripción: Mide la cantidad de proteína presente en la orina.
+#   Valores normales: Los valores normales de proteína en la orina suelen ser inferiores a 150 miligramos por día. Niveles más altos pueden indicar problemas renales o enfermedades como la diabetes o la hipertensión. (el dataset mide del 1 al 6, no sé qué signifique cada escalón, quizá cada entero son 100mg)
+#   Relación con el tabaco: Fumar puede contribuir a enfermedades renales.
+# 
+# Serum Creatinine (Creatinina en Suero):
+# Descripción: Mide la función renal.
+#   Valores normales: Varían según la edad y el género.
+    # Adultos (18-60 años):
+    # Hombres:
+    # Normal: 0.6 a 1.2 miligramos por decilitro (mg/dL)
+    # Mujeres:
+    # Normal: 0.5 a 1.1 mg/dL
+    # Adultos mayores (>60 años):
+    # Hombres:
+    # Normal: 0.7 a 1.3 mg/dL
+    # Mujeres:
+    # Normal: 0.6 a 1.2 mg/dL
+#   Relación con el tabaco: Fumar puede afectar la función renal.
+# 
+# AST (Aspartato Aminotransferasa) y ALT (Alanina Aminotransferasa):
+# Descripción: Enzimas hepáticas que indican la salud del hígado.
+#   Valores normales: Varían, pero valores elevados pueden indicar daño hepático.
+    # Los valores normales pueden variar según el laboratorio y las unidades de medida, pero en general, los valores típicos pueden ser:
+    # AST: 10 a 40 unidades por litro (U/L)
+    # ALT: 7 a 56 U/L
+#   Relación con el tabaco: Fumar puede contribuir al daño hepático.
+#   
+# GTP (γ-GTP):
+# Descripción: Otra enzima hepática que puede indicar daño en el hígado.
+#   Valores normales: Varían, pero valores elevados pueden indicar daño hepático.Los valores normales pueden variar, pero típicamente se encuentran en el rango de 9 a 48 U/L.
+#   Relación con el tabaco: Fumar puede contribuir al daño hepático.
+# 
+# Dental Caries (Caries Dentales):
+# Descripción: Presencia de cavidades en los dientes.
+#   Valores normales: Dientes sanos sin cavidades.El dataset indica con 1 a quien sí tiene carios y con 0 a quien no tiene caries
+#   Relación con el tabaco: Fumar puede aumentar el riesgo de enfermedades periodontales y caries.
+
+
+
 
 ```
 
