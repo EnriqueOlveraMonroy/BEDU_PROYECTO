@@ -418,17 +418,52 @@ sum(is.na(datos_prueba))
 ```{r}
 #BALANCEO DE DATOS DE ENTRENAMIENTO
 
+set.seed(2023)
+
+
+class_vector <- c(rep("A", 800), rep("B", 200))
+
+datos_desbalanceados <- data.frame(
+  dataset_filtrado = class_vector,
+  datos_entrenamiento_b = rnorm(1000),
+  datos_prueba_b= rnorm(1000)
+)
+
+table(datos_desbalanceados$dataset_filtrado)
+
+# Undersampling
+datos_balanceados_sub <- datos_desbalanceados %>%
+  group_by(dataset_filtrado) %>%
+  sample_n(min(table(dataset_filtrado)))
+
+# Distribución despues del undersampling
+table(datos_balanceados_sub$dataset_filtrado)
 
 
 
+#Oversampling
+table(datos_desbalanceados$dataset_filtrado)
+datos_desbalanceados$dataset_filtrado <- as.factor(datos_desbalanceados$dataset_filtrado)
 
+datos_balanceados_sobre <- upSample(x = datos_desbalanceados, y = datos_desbalanceados$dataset_filtrado)
+
+# Distribución despues del oversampling
+table(datos_balanceados_sobre$dataset_filtrado)
 
 
 
 
 
 ```
+```{r}
 
+#MODELO DE MACHINE DECISION TREE CON DATOS BALANCEADOS
+
+modelo_arbol <- rpart(smoking ~ ., data = datos_balanceados_sub, method = "class")
+
+predicciones_arbol <- predict(modelo_arbol, datos_prueba,type = "class")
+
+```
 
 
 ```{r}
