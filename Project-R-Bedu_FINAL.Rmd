@@ -22,7 +22,7 @@ library(randomForest)
 library(AER)
 library(readr)
 library(rpart)
-
+library(xgboost)
 
 
 ```
@@ -460,6 +460,13 @@ predicciones_arbol <- predict(modelo_arbol, datos_prueba,type = "class")
 
 ```
 
+```{r}
+if ("smoking" %in% names(datos_balanceados_sub)) {
+  print("La variable 'smoking' está presente en el conjunto de datos.")
+} else {
+  print("La variable 'smoking' no se encontró en el conjunto de datos.")
+}
+```
 
 ```{r}
 
@@ -484,6 +491,153 @@ mc <- confusionMatrix(predicciones, verdaderos)
 print(mc)
 
 ```
+```{r}
+#MODELO XGBOOST 1
+
+# Conversión a matriz necesaria para el modelo
+matriz = model.matrix(smoking ~ . -1, data = dataset_filtrado)
+
+set.seed(2023)
+
+trainIndex <-createDataPartition(dataset_filtrado$smoking, p = proporcion_entrenamiento,
+                                 list = FALSE, times = 1)
+
+# Matriz de entrenamiento, y de entrenamiento, matriz de prueba y y de prueba
+matriz_train <- matriz[trainIndex,]
+
+y_train = dataset_filtrado$smoking[trainIndex]
+
+y_train_numeric <- as.numeric(as.factor(y_train)) - 1
+
+
+
+matriz_test <- matriz[-trainIndex,]
+
+y_test = dataset_filtrado$smoking[-trainIndex]
+
+y_test_numeric <- as.numeric(as.factor(y_test)) - 1
+
+# Aplicación del modelo
+modelo_xgboost <- xgboost(data = matriz_train, max.depth = 8, eta = 1, nthread = 2,
+                          label = y_train_numeric, nrounds = 100, objective = "binary:logistic",
+                          eval.metric='error', verbose = 1)
+```
+
+```{r}
+#MATRIZ DE CONFUSIÓN XGBOOST 1
+
+# Convertir clasificaciones a factor (0, 1)
+predicciones_xgboost <- predict(modelo_xgboost, matriz_test)
+
+pred_xgboost <- as.numeric(predicciones_xgboost > 0.5)
+
+# Convertir a factores
+pred_xgboost <- as.factor(pred_xgboost)
+y_test <- as.factor(y_test)
+
+# Asegurar que ambos tengan los mismos niveles
+levels(pred_xgboost) <- levels(y_test)
+
+# Crear la matriz de confusión
+mc_xgboost <- confusionMatrix(pred_xgboost, y_test)
+
+# Imprimir la matriz de confusión
+print(mc_xgboost)
+```
+```{r}
+#IMPORTANCIA DE LAS VARIABLES EN XGBOOST
+importance <- xgb.importance(feature_names = colnames(matriz_train), model = modelo_xgboost)
+head(importance, n= 10)
+
+xgb.plot.importance(importance_matrix = importance)
+
+# VALIDACION CRUZADA XGBOOST 1
+
+xgb.fit1 <- xgb.cv(
+  data = matriz_train,
+  label = y_train_numeric,
+  nrounds = 100,
+  eval.metric = 'error',
+  max.depth = 8,
+  eta = 1,
+  nfold = 5,
+  objective = "binary:logistic",
+    verbose = 0
+)
+
+xgb.fit1$evaluation_log
+
+ggplot(xgb.fit1$evaluation_log) + 
+  geom_line(aes(iter, train_error_mean), color= "red") +
+  geom_line(aes(iter, test_error_mean), color= "blue")
+```
+
+```{r}
+#MEJORA EL MODELO XGBOOST1
+
+xgb.fit <- xgb.cv(
+  data = matriz_train,
+  label = y_train_numeric,
+  eval.metric = 'logloss',
+  objective = "binary:logistic",
+  nfold = 10,
+  
+  max.depth = 8,
+  eta = 0.06,
+  nthread= 5,
+  subsample= 1,
+  colsample_bytree= 0.5,
+  lambda= 0.5,
+  alpha= 0.5,
+  min_child_weight= 3,
+  nrounds = 125,
+)
+
+xgb.fit$evaluation_log
+
+ggplot(xgb.fit$evaluation_log) + 
+  geom_line(aes(iter, train_logloss_mean), color= "red") +
+  geom_line(aes(iter, test_logloss_mean), color= "blue")
+```
+```{r}
+#MODELO XGBOOST 2
+xgb.2 <- xgboost(data = matriz_train,
+                 max.depth = 8,
+                 eta = 0.06,
+                 nthread = 5,
+                 label = y_train_numeric,
+                 nrounds = 125,
+                 objective = "binary:logistic",
+                 colsample_bytree= 0.5,
+                 lambda= 0.5,
+                 alpha= 0.5,
+                 min_child_weight= 3,
+                 eval.metric='logloss',
+                 verbose = 1)
+```
+
+```{r}
+#MATRIZ DE CONFUSIÓN XGBOOST 2
+
+# Convertir clasificaciones a factor (0, 1)
+predicciones_xgb.2 <- predict(xgb.2, matriz_test)
+
+pred_xgb.2 <- as.numeric(predicciones_xgb.2 > 0.5)
+
+# Convertir a factores
+pred_xgb.2 <- as.factor(pred_xgb.2)
+y_test <- as.factor(y_test)
+
+# Asegurar que ambos tengan los mismos niveles
+levels(pred_xgb.2) <- levels(y_test)
+
+# Crear la matriz de confusión
+mc_xgb.2 <- confusionMatrix(pred_xgb.2, y_test)
+
+# Imprimir la matriz de confusión
+print(mc_xgb.2)
+```
+
 
 ```{r}
 #MODELO DE MACHINE REGRESIÓN LOGÍSTICA
