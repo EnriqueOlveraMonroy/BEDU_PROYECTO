@@ -37,10 +37,8 @@ View(dataset)
 
 ```{r}
 
-#DANIEL - Investigar las variables y términos médicos / Decidir argumentar si es bueno eliminar o no los outliers.
-
 #CONCLUSIÓN:
-# Sí hay que eliminar los outlayers de algunos valores, no tanto porque los valores no sean posibles, ya que algunos s epueden disparar con en condiciones especiales, pero en algunos hay inclongruencias, como en valores ALT y GTP. O errores de medición como en el caso de LDL. 
+# Sí hay que eliminar los outlayers de algunos valores, no tanto porque los valores no sean posibles, ya que algunos se, pueden disparar con en condiciones especiales, pero en algunos hay incongruencias, como en valores ALT y GTP. O errores de medición como en el caso de LDL. 
 
 # Eyesight (Visión) - Izquierda y Derecha:
 # 
@@ -141,10 +139,7 @@ View(dataset)
 #   Relación con el tabaco: Fumar puede aumentar el riesgo de enfermedades periodontales y caries.
 
 
-
-
 ```
-
 
 
 
@@ -299,14 +294,14 @@ eliminar_outliers <- function(data, cols) {
   data_filtrado <- data
   
   for (col in cols) {
-    # Calcula los límites superior e inferior utilizando el método de Tukey
+    # Calcula los límites superior e inferior
     Q1 <- quantile(data_filtrado[[col]], 0.25)
     Q3 <- quantile(data_filtrado[[col]], 0.75)
     IQR <- Q3 - Q1
     limite_inferior <- Q1 - 1.5 * IQR
     limite_superior <- Q3 + 1.5 * IQR
     
-    # Filtra los datos para excluir los outliers en la columna actual
+    # Filtra los datos para excluir los outliers
     data_filtrado <- data_filtrado %>% filter(data_filtrado[[col]] >= limite_inferior & data_filtrado[[col]] <= limite_superior)
   }
   
