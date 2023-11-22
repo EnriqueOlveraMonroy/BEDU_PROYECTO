@@ -37,19 +37,17 @@ View(dataset)
 ```
 
 ```{r}
-
 #CONCLUSIÓN:
 # Sí hay que eliminar los outlayers de algunos valores, no tanto porque los valores no sean posibles, ya que algunos se, pueden disparar con en condiciones especiales, pero en algunos hay incongruencias, como en valores ALT y GTP. O errores de medición como en el caso de LDL. 
 
 # Eyesight (Visión) - Izquierda y Derecha:
-# 
 #   Descripción: Mide la agudeza visual en el ojo izquierdo y derecho.
-#   Valores normales: 20/20 se considera visión normal. (del 0 al 2 en el dataframe, no hay info al respecto en los metadatos pero parecen 3 categorías)
+#   Valores normales: 20/20 se considera visión normal. (del 0 al 2 en el dataframe, en el origen de los datos 0 es agudeza visual y 9.9 ceguera, los datos sólo contienen 0, 1 y 2)
 #   Relación con el tabaco: Fumar puede aumentar el riesgo de enfermedades oculares como la degeneración macular y cataratas.
 #
 # Hearing (Audición) - Izquierda y Derecha:
 # Descripción: Evalúa la capacidad auditiva en el oído izquierdo y derecho.
-#   Valores normales: 1 es sí escucha, 2 es sordo.
+#   Valores normales: 1 es escuchar bien, 2 es escucha mal(anomalía)
 #   Relación con el tabaco: Fumar puede aumentar el riesgo de pérdida de audición relacionada con la edad.
 #   
 # Systolic Blood Pressure (Presión Arterial Sistólica):
@@ -90,8 +88,8 @@ View(dataset)
 #   
 # LDL Cholesterol (Colesterol LDL):
 # Descripción: Conocido como "colesterol malo", se acumula en las paredes de los vasos sanguíneos.
-#   Valores normales: Menos de 100 mg/dL.
-#   Valores de riesgo: 100-129 mg/dL se considera cerca del límite alto.
+#   Valores normales: Menos de 130 mg/dL.
+#   Valores de riesgo: arriba de 175 mg/dL.
 #   Relación con el tabaco: Fumar puede aumentar los niveles de LDL.
 #   
 # Hemoglobin (Hemoglobina):
@@ -103,7 +101,7 @@ View(dataset)
 # 
 # Urine Protein (Proteína en la Orina):
 # Descripción: Mide la cantidad de proteína presente en la orina.
-#   Valores normales: Los valores normales de proteína en la orina suelen ser inferiores a 150 miligramos por día. Niveles más altos pueden indicar problemas renales o enfermedades como la diabetes o la hipertensión. (el dataset mide del 1 al 6, no sé qué signifique cada escalón, quizá cada entero son 100mg)
+#   Valores normales: Los valores normales de proteína en la orina suelen ser inferiores a 150 miligramos por día. Niveles más altos pueden indicar problemas renales o enfermedades como la diabetes o la hipertensión. (el dataset mide del 1 al 6, 1 es baja, 2 es normal, y a partir del 3 aumenta.
 #   Relación con el tabaco: Fumar puede contribuir a enfermedades renales.
 # 
 # Serum Creatinine (Creatinina en Suero):
@@ -118,7 +116,7 @@ View(dataset)
     # Hombres:
     # Normal: 0.7 a 1.3 mg/dL
     # Mujeres:
-    # Normal: 0.6 a 1.2 mg/dL
+    # Normal: 0.6 a 1.2 mg/dL (en el dataset marca como normal .8 a 1.7mg/dL)
 #   Relación con el tabaco: Fumar puede afectar la función renal.
 # 
 # AST (Aspartato Aminotransferasa) y ALT (Alanina Aminotransferasa):
@@ -138,6 +136,85 @@ View(dataset)
 # Descripción: Presencia de cavidades en los dientes.
 #   Valores normales: Dientes sanos sin cavidades.El dataset indica con 1 a quien sí tiene carios y con 0 a quien no tiene caries
 #   Relación con el tabaco: Fumar puede aumentar el riesgo de enfermedades periodontales y caries.
+```
+
+
+```{r}
+# TEMP CELDA DE PRUEBAS
+# df de pruebas 
+smokers_2 <- dataset
+
+# variables derivadas (calculadas a partir de nuestros índices)
+smokers_2$lipid_ratio <- (smokers_2$HDL + smokers_2$LDL) / smokers_2$Cholesterol
+  # Rango Normal: 0.2 a 0.7
+  # Bajo: Menos de 0.2
+  # Elevado: Más de 0.7
+
+smokers_2$lipid_ratio2 <- smokers_2$triglyceride / smokers_2$HDL
+  # Rango Normal: 0.1 a 0.5
+  # Bajo: Menos de 0.1
+  # Elevado: Más de 0.5
+
+smokers_2$systolic_relaxation_ratio <- smokers_2$systolic / smokers_2$relaxation
+  # Rango Normal: 1 a 2
+  # Bajo: Menos de 1
+  # Elevado: Más de 2
+
+#eliminado el índice renal por falta de info en el dataframe
+
+# Definir rangos normales para cada variable (la mayoría sacados directo del origen del DF)
+normal_ranges <- data.frame(
+  variable = c("waist.cm.", "systolic", "relaxation", "fasting.blood.sugar", "Cholesterol", "triglyceride", "HDL", "LDL", "hemoglobin", "serum.creatinine", "AST", "ALT", "Gtp", "lipid_ratio", "lipid_ratio2", "systolic_relaxation_ratio"),
+  normal_range = c("70-90", "90-120", "60-80", "70-100", "150-250", "30-150", "30-65", "0-130", "12-16", "0.5-1.2", "10-40", "7-56", "10-40", "0.2-1.5", "0-10", "0.5-2")
+)
+
+# Convertir el rango normal a un rango numérico
+normal_ranges$normal_range <- t(apply(read.table(text = normal_ranges$normal_range, sep = "-"), 1, function(x) as.numeric(x)))
+
+# Función para verificar si un valor está dentro del rango normal
+is_within_normal_range <- function(value, normal_range) {
+  return(value >= normal_range[1] & value <= normal_range[2])
+}
+
+# Verificar cada variable y marcar los valores fuera de rango
+for (i in 1:nrow(normal_ranges)) {
+  variable_name <- normal_ranges$variable[i]
+  normal_range <- normal_ranges$normal_range[i, ]
+  
+  # Crear una nueva columna que indique si el valor está dentro del rango normal
+  smokers_2$within_normal_range <- is_within_normal_range(smokers_2[[variable_name]], normal_range)
+  
+  # Imprimir el recuento de valores fuera del rango normal para cada variable
+  cat("Valores fuera del rango normal para", variable_name, ":", sum(!smokers_2$within_normal_range), "\n")
+}
+
+# Quitar la columna temporal 'within_normal_range' después de la verificación
+smokers_2$within_normal_range <- NULL
+
+View(smokers_2)
+
+# FILTROS ACTUALIZADOS
+# Crear DataFrame para almacenar las filas filtradas
+smokers_filtrados <- dataset
+
+# Filtrar por valores muy elevados (raza ya a punto de colgar los tenis 9:)
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$waist.cm. <= 90, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$systolic <= 160, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$relaxation <= 100, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$fasting.blood.sugar <= 200, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$Cholesterol <= 300, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$triglyceride <= 500, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$HDL >= 30, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$LDL <= 190, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$hemoglobin <= 18, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$Urine.protein < 4, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$serum.creatinine <= 2.5, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$AST <= 80, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$ALT <= 100, ]
+smokers_filtrados <- smokers_filtrados[smokers_filtrados$Gtp <= 60, ]
+
+# Mostrar el resumen del DataFrame filtrado
+View(smokers_filtrados)
 
 
 ```
