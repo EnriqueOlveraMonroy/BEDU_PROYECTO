@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 #install.packages("AER")
+install.packages("ROSE")
 ```
 
 ```{r}
@@ -23,7 +24,7 @@ library(AER)
 library(readr)
 library(rpart)
 library(xgboost)
-
+library(ROSE)
 
 ```
 
@@ -398,6 +399,11 @@ for (col in colnames(dataset_filtrado)) {
 dataset_filtrado$smoking <- as.factor(dataset_filtrado$smoking)
 ```
 
+```{r}
+#CONTEO DE VALORES SMOKING (NO FUMADORES / FUMADORES)
+
+summary(dataset_filtrado$smoking)
+```
 
 
 ```{r}
@@ -432,67 +438,98 @@ sum(is.na(datos_prueba))
 
 
 ```{r}
-#CONTEO DE VALORES SMOKING (NO FUMADORES / FUMADORES)
+#CONTEO DE VALORES DE ENTRENAMIENTO SMOKING (NO FUMADORES / FUMADORES)
 
-summary(dataset_filtrado$smoking)
+summary(datos_entrenamiento$smoking)
+```
+
+```{r}
+#BALANCEO DE DATOS
+#https://rpubs.com/oscarqpe/BalanceoDatos
+#https://app.datacamp.com/workspace/preview?_tag=rdocs&rdocsPath=packages%2FROSE%2Fversions%2F0.0-4%2Ftopics%#2Fovun.sample&utm_source=r-docs&utm_medium=docs&utm_term=ovun.sample&utm_content=run_example_in_workspace
+
+datos_entrenamiento_balanceados <- ovun.sample(smoking~., data=datos_entrenamiento, 
+                                  p=0.50, seed=1, 
+                                  method="under")$data
 ```
 
 
 ```{r}
+print(datos_entrenamiento_balanceados)
+```
+```{r}
+#TOTAL DE DATOS BALANCEADOS POR UNDERSAMPLING
+
+summary(datos_entrenamiento_balanceados$smoking)
+
+```
+
+
+
+
+```{r}
+
+#ERROR AL EJECUTARSE / NO SE OBTIENE LO QUE SE NECESITA
+
 #BALANCEO DE DATOS DE ENTRENAMIENTO
 
-set.seed(2023)
+#set.seed(2023)
 
 
-class_vector <- c(rep("A", 800), rep("B", 200))
+#class_vector <- c(rep("A", 800), rep("B", 200))
 
-datos_desbalanceados <- data.frame(
-  dataset_filtrado = class_vector,
-  datos_entrenamiento_b = rnorm(1000),
-  datos_prueba_b= rnorm(1000)
-)
+#datos_desbalanceados <- data.frame(
+ # dataset_filtrado = class_vector,
+  #datos_entrenamiento_b = rnorm(1000),
+  #datos_prueba_b= rnorm(1000)
+#)
 
-table(datos_desbalanceados$dataset_filtrado)
+#table(datos_desbalanceados$dataset_filtrado)
 
 # Undersampling
-datos_balanceados_sub <- datos_desbalanceados %>%
-  group_by(dataset_filtrado) %>%
-  sample_n(min(table(dataset_filtrado)))
+#datos_balanceados_sub <- datos_desbalanceados %>%
+ # group_by(dataset_filtrado) %>%
+#  sample_n(min(table(dataset_filtrado)))
 
 # Distribución despues del undersampling
-table(datos_balanceados_sub$dataset_filtrado)
+#table(datos_balanceados_sub$dataset_filtrado)
 
 
 
 #Oversampling
-table(datos_desbalanceados$dataset_filtrado)
-datos_desbalanceados$dataset_filtrado <- as.factor(datos_desbalanceados$dataset_filtrado)
+#table(datos_desbalanceados$dataset_filtrado)
+#datos_desbalanceados$dataset_filtrado <- as.factor(datos_desbalanceados$dataset_filtrado)
 
-datos_balanceados_sobre <- upSample(x = datos_desbalanceados, y = datos_desbalanceados$dataset_filtrado)
+#datos_balanceados_sobre <- upSample(x = datos_desbalanceados, y = datos_desbalanceados$dataset_filtrado)
 
 # Distribución despues del oversampling
-table(datos_balanceados_sobre$dataset_filtrado)
+#table(datos_balanceados_sobre$dataset_filtrado)
 ```
 
 
 ```{r}
-print(datos_balanceados_sub)
-
-```
-
-
-```{r}
-
 #MODELO DE MACHINE DECISION TREE CON DATOS BALANCEADOS
 
-modelo_arbol <- rpart(smoking ~ ., data = datos_balanceados_sub, method = "class")
+modelo_arbol <- rpart(smoking ~ ., data = datos_entrenamiento_balanceados, method = "class")
 
 predicciones_arbol <- predict(modelo_arbol, datos_prueba,type = "class")
+```
 
+
+```{r}
+
+#MATRIZ DE CONFUSIÓN DECISION TREE BALANCEADO
+
+verdaderos <- datos_prueba$smoking  
+predicciones <- predicciones_arbol
+
+mc <- confusionMatrix(predicciones, verdaderos)
+
+print(mc)
 ```
 
 ```{r}
-if ("smoking" %in% names(datos_balanceados_sub)) {
+if ("smoking" %in% names(datos_entrenamiento_balanceados)) {
   print("La variable 'smoking' está presente en el conjunto de datos.")
 } else {
   print("La variable 'smoking' no se encontró en el conjunto de datos.")
