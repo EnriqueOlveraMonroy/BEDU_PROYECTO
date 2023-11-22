@@ -469,41 +469,21 @@ summary(datos_entrenamiento_balanceados$smoking)
 
 ```{r}
 
-#ERROR AL EJECUTARSE / NO SE OBTIENE LO QUE SE NECESITA
 
 #BALANCEO DE DATOS DE ENTRENAMIENTO
+# Contar el número de instancias para cada valor de 'smoking'
+table(dataset_filtrado$smoking)
 
-#set.seed(2023)
+# Realizar submuestreo
+set.seed(2023)  
+datos_seleccionados <- dataset_filtrado %>%
+  group_by(smoking) %>%
+  sample_n(23543)
 
-
-#class_vector <- c(rep("A", 800), rep("B", 200))
-
-#datos_desbalanceados <- data.frame(
- # dataset_filtrado = class_vector,
-  #datos_entrenamiento_b = rnorm(1000),
-  #datos_prueba_b= rnorm(1000)
-#)
-
-#table(datos_desbalanceados$dataset_filtrado)
-
-# Undersampling
-#datos_balanceados_sub <- datos_desbalanceados %>%
- # group_by(dataset_filtrado) %>%
-#  sample_n(min(table(dataset_filtrado)))
-
-# Distribución despues del undersampling
-#table(datos_balanceados_sub$dataset_filtrado)
+# Verificar el nuevo conteo
+table(datos_seleccionados$smoking)
 
 
-
-#Oversampling
-#table(datos_desbalanceados$dataset_filtrado)
-#datos_desbalanceados$dataset_filtrado <- as.factor(datos_desbalanceados$dataset_filtrado)
-
-#datos_balanceados_sobre <- upSample(x = datos_desbalanceados, y = datos_desbalanceados$dataset_filtrado)
-
-# Distribución despues del oversampling
-#table(datos_balanceados_sobre$dataset_filtrado)
 ```
 
 
