@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 #install.packages("AER")
-install.packages("ROSE")
+#install.packages("ROSE")
 ```
 
 ```{r}
@@ -484,6 +484,29 @@ summary(dataset_filtrado$smoking)
 
 
 ```{r}
+dataset_filtrado
+```
+
+
+```{r}
+#ESTANDARIZACIÓN DE DATOS 
+
+# Reescalamos las variables para que tengan media cero y desviación estandar igual a 1
+
+
+# Seleccionar todas las columnas excepto 'dental.caries' y 'smoking'
+columnas_a_mutar <- setdiff(names(dataset_filtrado), c('dental.caries', 'smoking', 'hearing.left.','hearing.right.','Urine.protein'))
+
+# Aplicar la función scale a las columnas seleccionadas
+dataset_filtrado <- dataset_filtrado %>%
+  mutate_at(vars(columnas_a_mutar), scale)
+
+# Mostrar el conjunto de datos resultante
+print(dataset_filtrado)
+```
+
+
+```{r}
 #DIVIDIR DATOS DE ENTRENAMIENTO Y DE PRUEBA
 
 set.seed(2023)
@@ -509,6 +532,9 @@ dim(datos_prueba)
 
 
 ```{r}
+
+#CONFIRMACIÓN DE QUE NO HAY NAN
+
 sum(is.na(datos_entrenamiento))
 sum(is.na(datos_prueba))
 ```
@@ -520,48 +546,25 @@ sum(is.na(datos_prueba))
 summary(datos_entrenamiento$smoking)
 ```
 
+
+
 ```{r}
+
 #BALANCEO DE DATOS DE ENTRENAMIENTO
 
-#https://rpubs.com/oscarqpe/BalanceoDatos
-#https://app.datacamp.com/workspace/preview?_tag=rdocs&rdocsPath=packages%2FROSE%2Fversions%2F0.0-4%2Ftopics%#2Fovun.sample&utm_source=r-docs&utm_medium=docs&utm_term=ovun.sample&utm_content=run_example_in_workspace
-
-datos_entrenamiento_balanceados <- ovun.sample(smoking~., data=datos_entrenamiento, 
-                                  p=0.50, seed=1, 
-                                  method="over")$data
-```
-
-
-```{r}
-print(datos_entrenamiento_balanceados)
-```
-```{r}
-#TOTAL DE DATOS BALANCEADOS POR UNDERSAMPLING
-
-summary(datos_entrenamiento_balanceados$smoking)
-
-```
-
-
-
-
-```{r}
-
-
-#BALANCEO DE DATOS DE ENTRENAMIENTO
 # Contar el número de instancias para cada valor de 'smoking'
-table(dataset_filtrado$smoking)
+table(datos_entrenamiento$smoking)
 
 # Realizar submuestreo
 set.seed(2023)  
-datos_seleccionados <- dataset_filtrado %>%
+datos_entrenamiento_balanceados <- datos_entrenamiento %>%
   group_by(smoking) %>%
-  sample_n(23543)
+  sample_n(23543) #AQUÍ ES SEGÚN EL NÚMERO DE TRUE Y FALSE QUERRAMOS USAR.
 
 # Verificar el nuevo conteo
-table(datos_seleccionados$smoking)
+table(datos_entrenamiento_balanceados$smoking)
 
-
+print(datos_entrenamiento_balanceados)
 ```
 
 
@@ -597,7 +600,7 @@ rpart.plot(modelo_arbol)
 
 ```{r}
 
-#MODELO DE MACHINE DECISION TREE
+#MODELO DE MACHINE DECISION TREE SIN BALANCEO DE DATOS
 
 modelo_arbol <- rpart(smoking ~ ., data = datos_entrenamiento, method = "class")
 
@@ -607,7 +610,7 @@ predicciones_arbol <- predict(modelo_arbol, datos_prueba,type = "class")
 
 
 ```{r}
-#MATRIZ DE CONFUSIÓN DECISION TREE
+#MATRIZ DE CONFUSIÓN DECISION TREE SIN BALANCEO DE DATOS
 
 verdaderos <- datos_prueba$smoking  
 predicciones <- predicciones_arbol
@@ -619,7 +622,7 @@ print(mc)
 
 
 ```{r}
-#VISUALIZACIÓN DE DECISION TREE
+#VISUALIZACIÓN DE DECISION TREE SIN BALANCEO DE DATOS
 
 library(rpart)
 library(rpart.plot)
