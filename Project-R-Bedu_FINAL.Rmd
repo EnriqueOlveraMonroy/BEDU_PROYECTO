@@ -444,13 +444,14 @@ summary(datos_entrenamiento$smoking)
 ```
 
 ```{r}
-#BALANCEO DE DATOS
+#BALANCEO DE DATOS DE ENTRENAMIENTO
+
 #https://rpubs.com/oscarqpe/BalanceoDatos
 #https://app.datacamp.com/workspace/preview?_tag=rdocs&rdocsPath=packages%2FROSE%2Fversions%2F0.0-4%2Ftopics%#2Fovun.sample&utm_source=r-docs&utm_medium=docs&utm_term=ovun.sample&utm_content=run_example_in_workspace
 
 datos_entrenamiento_balanceados <- ovun.sample(smoking~., data=datos_entrenamiento, 
                                   p=0.50, seed=1, 
-                                  method="under")$data
+                                  method="over")$data
 ```
 
 
@@ -517,7 +518,6 @@ predicciones_arbol <- predict(modelo_arbol, datos_prueba,type = "class")
 
 
 ```{r}
-
 #MATRIZ DE CONFUSIÓN DECISION TREE BALANCEADO
 
 verdaderos <- datos_prueba$smoking  
@@ -528,12 +528,14 @@ mc <- confusionMatrix(predicciones, verdaderos)
 print(mc)
 ```
 
+
 ```{r}
-if ("smoking" %in% names(datos_entrenamiento_balanceados)) {
-  print("La variable 'smoking' está presente en el conjunto de datos.")
-} else {
-  print("La variable 'smoking' no se encontró en el conjunto de datos.")
-}
+#VISUALIZACIÓN DE DECISION TREE
+
+library(rpart)
+library(rpart.plot)
+
+rpart.plot(modelo_arbol)
 ```
 
 ```{r}
@@ -560,6 +562,7 @@ print(mc)
 
 
 ```{r}
+#VISUALIZACIÓN DE DECISION TREE
 
 library(rpart)
 library(rpart.plot)
