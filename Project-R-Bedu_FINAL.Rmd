@@ -292,12 +292,23 @@ matriz_correlacion <- cor(dataset)
 library(corrplot)  
 corrplot(matriz_correlacion, method = "color")
 ```
+```{r}
+
+#FILTRADO POR MEDICIONES ERRÓNEAS
+
+
+
+
+
+
+```
 
 
 
 ```{r}
 
 #ELIMINAR OUTLIERS DE TODAS LAS COLUMNAS
+
 
 # Función para identificar y eliminar outliers
 eliminar_outliers <- function(data, cols) {
