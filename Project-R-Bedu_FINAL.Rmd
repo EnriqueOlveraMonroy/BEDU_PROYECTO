@@ -482,7 +482,6 @@ predicciones_arbol <- predict(modelo_arbol, datos_prueba,type = "class")
 
 
 ```{r}
-
 #MATRIZ DE CONFUSIÓN DECISION TREE
 
 verdaderos <- datos_prueba$smoking  
@@ -491,6 +490,15 @@ predicciones <- predicciones_arbol
 mc <- confusionMatrix(predicciones, verdaderos)
 
 print(mc)
+```
+
+
+```{r}
+
+library(rpart)
+library(rpart.plot)
+
+rpart.plot(modelo_arbol)
 
 ```
 
