@@ -444,12 +444,14 @@ datos_balanceados_sobre <- upSample(x = datos_desbalanceados, y = datos_desbalan
 
 # Distribución despues del oversampling
 table(datos_balanceados_sobre$dataset_filtrado)
-
-
-
-
-
 ```
+
+
+```{r}
+print(datos_balanceados_sub)
+```
+
+
 ```{r}
 
 #MODELO DE MACHINE DECISION TREE CON DATOS BALANCEADOS
@@ -491,6 +493,7 @@ mc <- confusionMatrix(predicciones, verdaderos)
 print(mc)
 
 ```
+
 ```{r}
 #MODELO XGBOOST 1
 
@@ -638,52 +641,4 @@ mc_xgb.2 <- confusionMatrix(pred_xgb.2, y_test)
 print(mc_xgb.2)
 ```
 
-
-```{r}
-#MODELO DE MACHINE REGRESIÓN LOGÍSTICA
-
-#rg_log <- glm(smoking ~ ., data = datos_entrenamiento, family = "binomial")
-#predicciones_rglog <- predict(rg_log, datos_prueba,type = "response")
-#predicciones_clase <- ifelse(predicciones_rglog > 0.5, TRUE, FALSE)
-```
-
-
-```{r}
-
-#MATRIZ DE CONFUSIÓN REGRESIÓN LOGÍSTICA
-
-#verdaderos <- datos_prueba$smoking  
-#predicciones <- predicciones_clase
-
-#mc <- confusionMatrix(predicciones, verdaderos)
-
-#print(mc)
-
-```
-
-
-```{r}
-#MODELO DE MACHINE LEARNING SVM
-
-#modelo_svm <- svm(smoking ~ ., data = datos_entrenamiento)
-#predicciones_svm <- predict(modelo_svm, datos_prueba,type = "class")
-
-#ERROR
-#Warning: Variable(s) ‘hearing.left.’ and ‘hearing.right.’ and ‘Urine.protein’ constant. Cannot scale data.
-
-
-```
-
-
-```{r}
-#MATRIZ DE CONFUSIÓN SVM
-
-#verdaderos <- datos_prueba$smoking  
-#predicciones <- predicciones_svm
-
-#mc <- confusionMatrix(predicciones, verdaderos)
-
-#print(mc)
-
-```
 
