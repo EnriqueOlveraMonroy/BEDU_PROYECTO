@@ -138,37 +138,6 @@ View(dataset)
 #   Relación con el tabaco: Fumar puede aumentar el riesgo de enfermedades periodontales y caries.
 ```
 
-
-```{r}
-# TEMP CELDA DE PRUEBAS, SE PUEDE ELIMINAR
-# df de pruebas 
-# smokers_2 <- dataset
-
-# variables derivadas (calculadas a partir de nuestros índices)
-# smokers_2$lipid_ratio <- (smokers_2$HDL + smokers_2$LDL) / smokers_2$Cholesterol
-  # Rango Normal: 0.2 a 0.7
-  # Bajo: Menos de 0.2
-  # Elevado: Más de 0.7
-
-# smokers_2$lipid_ratio2 <- smokers_2$triglyceride / smokers_2$HDL
-  # Rango Normal: 0.1 a 0.5
-  # Bajo: Menos de 0.1
-  # Elevado: Más de 0.5
-
-# smokers_2$systolic_relaxation_ratio <- smokers_2$systolic / smokers_2$relaxation
-  # Rango Normal: 1 a 2
-  # Bajo: Menos de 1
-  # Elevado: Más de 2
-
-#eliminado el índice renal por falta de info en el dataframe
-
-```
-
-
-
-
-
-
 Como podemos observar, el conjunto de datos tiene 159256 observaciones y 24 variables. Es un dataset sobre el historial médico de fumadores y no fumadores.
 
 ```{r}
@@ -313,9 +282,7 @@ matriz_correlacion <- cor(dataset)
 library(corrplot)  
 corrplot(matriz_correlacion, method = "color")
 ```
-```{r}
 
-#FILTRADO POR MEDICIONES ERRÓNEAS
 
 ```{r}
 # Crear DataFrame para almacenar valores extraordinarios
@@ -339,7 +306,7 @@ rango_gtp <- c(10, 80)
 
 # Filtrar por valores muy elevados y muy bajos
 
-# Se separa el dataset en 2, por un lado se filtran todos los valores extraordinarios (altos o bajos) ya que están ligados a un problema de salud grave o a un error de medición, y en el otro dataset los valores restantes.
+# Se separa el dataset en 2, por un lado se filtran todos los valores extraordinarios (altos o bajos) ya que están ligados a un problema de salud grave o a un error de medición, y en el otro dataset los valores restantes que de acuerdo a nuestra investigación son valores correctos.
 
 
 smk_ext <- smk_ext[
@@ -398,57 +365,28 @@ View(smk_ext)
 View(smk_norm)
 
 ```
+Como podemos observar, luego de aplicar un minucioso filtro a los datos el conjunto de datos queda con 139,585 observaciones y 22 variables.
 
 
+```{r}
 
+#CREACIÓN DEL DATASET FILTRADO
 
-
+dataset_filtrado <- smk_norm
+print(dataset_filtrado)
 ```
 
 
 
 ```{r}
-
-#ELIMINAR OUTLIERS DE TODAS LAS COLUMNAS
-
-
-# Función para identificar y eliminar outliers
-eliminar_outliers <- function(data, cols) {
-  data_filtrado <- data
-  
-  for (col in cols) {
-    # Calcula los límites superior e inferior
-    Q1 <- quantile(data_filtrado[[col]], 0.25)
-    Q3 <- quantile(data_filtrado[[col]], 0.75)
-    IQR <- Q3 - Q1
-    limite_inferior <- Q1 - 1.5 * IQR
-    limite_superior <- Q3 + 1.5 * IQR
-    
-    # Filtra los datos para excluir los outliers
-    data_filtrado <- data_filtrado %>% filter(data_filtrado[[col]] >= limite_inferior & data_filtrado[[col]] <= limite_superior)
-  }
-  
-  return(data_filtrado)
-}
-
-# Especifica las columnas a las que deseas aplicar la eliminación de outliers
-columnas_a_filtrar <- colnames(dataset)
-
-# Aplica la función para eliminar outliers
-dataset_filtrado <- eliminar_outliers(dataset, columnas_a_filtrar)
-
-```
-
-
-```{r}
-#DATASET FILTRADO
+#BOXPLOT DE DATASET FILTRADO
 
 par(mfrow=c(1, 1))
 boxplot(dataset_filtrado, col = "lightblue", border = "black")
 par(cex.axis=0.8) 
 par(las=2)
 ```
-
+Pueden existir niveles elevados, debido a problemas de salud.
 
 ```{r}
 #ESTADÍSTICAS POR COLUMNA DATOS FILTRADOS
@@ -495,6 +433,8 @@ for (col in colnames(dataset_filtrado)) {
 }
 
 ```
+
+
 ```{r}
 #VARIABLE OBJETIVO COMO FACTOR
 dataset_filtrado$smoking <- as.factor(dataset_filtrado$smoking)
@@ -503,12 +443,9 @@ dataset_filtrado$smoking <- as.factor(dataset_filtrado$smoking)
 ```{r}
 #CONTEO DE VALORES SMOKING (NO FUMADORES / FUMADORES)
 
+#Se detecta un desbalanceo de los datos
 summary(dataset_filtrado$smoking)
-```
 
-
-```{r}
-dataset_filtrado
 ```
 
 
@@ -583,7 +520,7 @@ table(datos_entrenamiento$smoking)
 set.seed(2023)  
 datos_entrenamiento_balanceados <- datos_entrenamiento %>%
   group_by(smoking) %>%
-  sample_n(23543) #AQUÍ ES SEGÚN EL NÚMERO DE TRUE Y FALSE QUERRAMOS USAR.
+  sample_n(46592) #AQUÍ ES SEGÚN EL NÚMERO DE TRUE Y FALSE QUERRAMOS USAR.
 
 # Verificar el nuevo conteo
 table(datos_entrenamiento_balanceados$smoking)
