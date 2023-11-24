@@ -25,7 +25,7 @@ library(readr)
 library(rpart)
 library(xgboost)
 library(ROSE)
-
+library(kknn)
 ```
 
 
@@ -764,7 +764,7 @@ ggplot(xgb.fit$evaluation_log) +
   geom_line(aes(iter, test_logloss_mean), color= "blue")
 ```
 ```{r}
-#MODELO XGBOOST 2
+#MODELO XGBOOST 2 SIN BALANCEO DE DATOS
 xgb.2 <- xgboost(data = matriz_train,
                  max.depth = 8,
                  eta = 0.06,
@@ -781,7 +781,7 @@ xgb.2 <- xgboost(data = matriz_train,
 ```
 
 ```{r}
-#MATRIZ DE CONFUSIÓN XGBOOST 2
+#MATRIZ DE CONFUSIÓN XGBOOST 2 SIN BALANCEO DE DATOS
 
 # Convertir clasificaciones a factor (0, 1)
 predicciones_xgb.2 <- predict(xgb.2, matriz_test)
@@ -800,6 +800,101 @@ mc_xgb.2 <- confusionMatrix(pred_xgb.2, y_test)
 
 # Imprimir la matriz de confusión
 print(mc_xgb.2)
+```
+
+```{r}
+#MODELO XGBOOST 2 CON DATOS BALANCEADOS
+
+#DIVIDIR DATOS DE ENTRENAMIENTO Y DE PRUEBA
+
+#BALANCEO DE DATOS DE ENTRENAMIENTO
+
+# Matriz de entrenamiento, y de entrenamiento, matriz de prueba y y de prueba
+matriz_train <- model.matrix(smoking ~ . -1, data = datos_entrenamiento_balanceados)
+
+y_train = datos_entrenamiento_balanceados$smoking
+
+y_train_numeric <- as.numeric(as.factor(y_train)) - 1
+
+
+
+matriz_test <- model.matrix(smoking ~ . -1, data = datos_prueba)
+
+y_test = datos_prueba$smoking
+
+y_test_numeric <- as.numeric(as.factor(y_test)) - 1
+
+# Aplicación del modelo
+
+xgb.3 <- xgboost(data = matriz_train,
+                 max.depth = 8,
+                 eta = 0.06,
+                 nthread = 5,
+                 label = y_train_numeric,
+                 nrounds = 125,
+                 objective = "binary:logistic",
+                 colsample_bytree= 0.5,
+                 lambda= 0.5,
+                 alpha= 0.5,
+                 min_child_weight= 3,
+                 eval.metric='logloss',
+                 verbose = 1)
+```
+
+```{r}
+#MATRIZ DE CONFUSIÓN XGBOOST 2 CON DATOS BALANCEADOS
+# Convertir clasificaciones a factor (0, 1)
+predicciones_xgb.3 <- predict(xgb.3, matriz_test)
+
+pred_xgb.3 <- as.numeric(predicciones_xgb.3 > 0.5)
+
+# Convertir a factores
+pred_xgb.3 <- as.factor(pred_xgb.3)
+y_test <- as.factor(y_test)
+
+# Asegurar que ambos tengan los mismos niveles
+levels(pred_xgb.3) <- levels(y_test)
+
+# Crear la matriz de confusión
+mc_xgb.3 <- confusionMatrix(pred_xgb.3, y_test)
+
+# Imprimir la matriz de confusión
+print(mc_xgb.3)
+```
+
+
+```{r}
+#MODELO KNN SIN BALANCEO DE DATOS
+modelo_knn <- train.kknn(smoking ~ ., data = datos_entrenamiento)
+predicciones_knn <- predict(modelo_knn, datos_prueba)
+```
+
+```{r}
+#MATRIZ DE CONFUSIÓN KNN SIN BALANCEO DE DATOS
+
+verdaderos <-datos_prueba$smoking
+predicciones <- predicciones_knn
+
+mc <-confusionMatrix(predicciones, verdaderos)
+
+print(mc)
+```
+
+```{r}
+#MODELO KNN CON DATOS BALANCEADOS
+modelo_knn_bal <- train.kknn(smoking ~ ., data = datos_entrenamiento_balanceados)#, kmax = 2)
+predicciones_knn_bal <- predict(modelo_knn_bal, datos_prueba)
+```
+
+```{r}
+#MATRIZ DE CONFUSIÓN KNN CON DATOS BALANCEADOS
+
+verdaderos_knn_bal <-datos_prueba$smoking
+predicciones_knn_bal <- predicciones_knn_bal
+
+mc <-confusionMatrix(predicciones_knn_bal, verdaderos_knn_bal)
+
+print(mc)
 ```
 
 
