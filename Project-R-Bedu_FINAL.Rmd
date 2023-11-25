@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #install.packages("AER")
 #install.packages("ROSE")
+install.packages("data.table")
+
 ```
 
 ```{r}
@@ -26,6 +28,8 @@ library(rpart)
 library(xgboost)
 library(ROSE)
 library(kknn)
+library(data.table)
+
 ```
 
 
@@ -591,6 +595,12 @@ library(rpart.plot)
 rpart.plot(modelo_arbol)
 
 ```
+ARBOL DE DECISION CON DATOS BALANCEADOS
+ACCURACY 71.88%
+
+ARBOL DE DECISION CON DATOS NO BALANCEADOS
+ACCURACY 73.01%
+
 
 ```{r}
 #MODELO XGBOOST 1
