@@ -631,7 +631,7 @@ y_test_numeric <- as.numeric(as.factor(y_test)) - 1
 # Aplicación del modelo
 modelo_xgboost <- xgboost(data = matriz_train, max.depth = 8, eta = 1, nthread = 2,
                           label = y_train_numeric, nrounds = 100, objective = "binary:logistic",
-                          eval.metric='error', verbose = 1)
+                          eval.metric='logloss', verbose = 1)
 ```
 
 ```{r}
@@ -668,7 +668,7 @@ xgb.fit1 <- xgb.cv(
   data = matriz_train,
   label = y_train_numeric,
   nrounds = 100,
-  eval.metric = 'error',
+  eval.metric = 'logloss',
   max.depth = 8,
   eta = 1,
   nfold = 5,
@@ -679,8 +679,8 @@ xgb.fit1 <- xgb.cv(
 xgb.fit1$evaluation_log
 
 ggplot(xgb.fit1$evaluation_log) + 
-  geom_line(aes(iter, train_error_mean), color= "red") +
-  geom_line(aes(iter, test_error_mean), color= "blue")
+  geom_line(aes(iter, train_logloss_mean), color= "red") +
+  geom_line(aes(iter, test_logloss_mean), color= "blue")
 ```
 
 ```{r}
@@ -747,6 +747,22 @@ mc_xgb.2 <- confusionMatrix(pred_xgb.2, y_test)
 
 # Imprimir la matriz de confusión
 print(mc_xgb.2)
+```
+```{r}
+# Crear la matriz de confusión con precision y recall
+mc_xgb.2 <- confusionMatrix(pred_xgb.2, y_test, mode = "prec_recall")
+
+# Imprimir la matriz de confusión
+print(mc_xgb.2)
+```
+
+
+```{r}
+#IMPORTANCIA DE VARIABLES XGBOOST 2 SIN BALANCEO DE DATOS
+importance <- xgb.importance(feature_names = colnames(matriz_train), model = xgb.2)
+head(importance, n= 10)
+
+xgb.plot.importance(importance_matrix = importance)
 ```
 
 ```{r}
